@@ -527,17 +527,13 @@ public class WifiIotPlugin implements MethodCallHandler, EventChannel.StreamHand
     }
 
     private void connect(final MethodCall poCall, final Result poResult) {
-        new Thread() {
-            public void run() {
-                String ssid = poCall.argument("ssid");
-                String password = poCall.argument("password");
-                String security = poCall.argument("security");
-                Boolean joinOnce = poCall.argument("join_once");
+        String ssid = poCall.argument("ssid");
+        String password = poCall.argument("password");
+        String security = poCall.argument("security");
+        Boolean joinOnce = poCall.argument("join_once");
 
-                boolean connected = connectTo(ssid, password, security, joinOnce);
-                poResult.success(connected);
-            }
-        }.start();
+        boolean connected = connectTo(ssid, password, security, joinOnce);
+        poResult.success(connected);
     }
 
     /// Send the ssid and password of a Wifi network into this to connect to the network.
