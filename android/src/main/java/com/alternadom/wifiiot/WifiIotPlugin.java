@@ -536,14 +536,16 @@ public class WifiIotPlugin implements MethodCallHandler, EventChannel.StreamHand
     }
 
     private void connect(final MethodCall poCall, final Result poResult) {
-        String ssid = poCall.argument("ssid");
-        String password = poCall.argument("password");
-        String security = poCall.argument("security");
-        Boolean joinOnce = poCall.argument("join_once");
+        new Thread() {
+            public void run() {
+                String ssid = poCall.argument("ssid");
+                String password = poCall.argument("password");
+                String security = poCall.argument("security");
+                Boolean joinOnce = poCall.argument("join_once");
 
                 final boolean connected = connectTo(ssid, password, security, joinOnce);
                 
-				final Handler handler = new Handler(Looper.getMainLooper());
+		final Handler handler = new Handler(Looper.getMainLooper());
                 handler.post(new Runnable() {
                     @Override
                     public void run () {
