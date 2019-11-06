@@ -105,6 +105,9 @@ public class WifiIotPlugin implements MethodCallHandler, EventChannel.StreamHand
             case "forceWifiUsage":
                 forceWifiUsage(poCall, poResult);
                 break;
+            case "checkWifiUsage":
+                checkWifiUsage(poResult);
+                break;
             case "isEnabled":
                 isEnabled(poResult);
                 break;
@@ -521,6 +524,25 @@ public class WifiIotPlugin implements MethodCallHandler, EventChannel.StreamHand
             }
         }
         poResult.success(null);
+    }
+
+    /// Method to check wifi usage if the user needs to send requests via wifi
+    /// if it does not have internet connection. Useful for IoT applications, when
+    /// the app needs to communicate and send requests to a device that have no
+    /// internet connection via wifi.
+    private void checkWifiUsage(Result poResult) {
+        boolean canWriteFlag = false;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                canWriteFlag = Settings.System.canWrite(moContext);
+
+                poResult.success(canWriteFlag);
+                return;
+            }
+        }
+        
+        poResult.success(true);
     }
 
     /// Method to check if wifi is enabled
