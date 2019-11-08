@@ -476,20 +476,20 @@ public class WifiIotPlugin implements MethodCallHandler, EventChannel.StreamHand
         if (useWifi) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    canWriteFlag = Settings.System.canWrite(moContext);
+//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//                    canWriteFlag = Settings.System.canWrite(moContext);
+//
+//                    if (!canWriteFlag) {
+//                        Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
+//                        intent.setData(Uri.parse("package:" + moContext.getPackageName()));
+//                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//
+//                        moContext.startActivity(intent);
+//                    }
+//                }
 
-                    if (!canWriteFlag) {
-                        Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
-                        intent.setData(Uri.parse("package:" + moContext.getPackageName()));
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-                        moContext.startActivity(intent);
-                    }
-                }
-
-
-                if (((Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) && canWriteFlag) || ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) && !(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M))) {
+                if (((Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) /*&& canWriteFlag*/) || ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) && !(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M))) {
                     final ConnectivityManager manager = (ConnectivityManager) moContext
                             .getSystemService(Context.CONNECTIVITY_SERVICE);
                     NetworkRequest.Builder builder;
