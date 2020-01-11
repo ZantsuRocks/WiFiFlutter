@@ -71,6 +71,11 @@ public class WifiIotPlugin implements MethodCallHandler, EventChannel.StreamHand
      * Plugin registration.
      */
     public static void registerWith(Registrar registrar) {
+        if (registrar.activity() == null) {
+            // When a background flutter view tries to register the plugin, the registrar has no activity.
+            // We stop the registration process as this plugin is foreground only.
+            return;
+        }
         final MethodChannel channel = new MethodChannel(registrar.messenger(), "wifi_iot");
         final EventChannel eventChannel = new EventChannel(registrar.messenger(), "plugins.wififlutter.io/wifi_scan");
         final WifiIotPlugin wifiIotPlugin = new WifiIotPlugin(registrar.activity());
@@ -196,9 +201,6 @@ public class WifiIotPlugin implements MethodCallHandler, EventChannel.StreamHand
 //        Log.d(this.getClass().toString(), sResult);
         boolean bEnable = poCall.argument("state");
 
-
-        /// cat /data/misc/wifi_hostapd/hostapd.accept
-
         Log.e(this.getClass().toString(), "TODO : Develop function to enable/disable MAC filtering...");
 
         poResult.error("TODO", "Develop function to enable/disable MAC filtering...", null);
@@ -214,8 +216,11 @@ public class WifiIotPlugin implements MethodCallHandler, EventChannel.StreamHand
      */
     private void getWiFiAPSSID(Result poResult) {
         WifiConfiguration oWiFiConfig = moWiFiAPManager.getWifiApConfiguration();
-        String sAPSSID = oWiFiConfig.SSID;
-        poResult.success(sAPSSID);
+        if (oWiFiConfig != null && oWiFiConfig.SSID != null) {
+            poResult.success(oWiFiConfig.SSID);
+            return;
+        }
+        poResult.error("Exception", "SSID not found", null);
     }
 
     private void setWiFiAPSSID(MethodCall poCall, Result poResult) {
@@ -236,8 +241,11 @@ public class WifiIotPlugin implements MethodCallHandler, EventChannel.StreamHand
      */
     private void isSSIDHidden(Result poResult) {
         WifiConfiguration oWiFiConfig = moWiFiAPManager.getWifiApConfiguration();
-        boolean isSSIDHidden = oWiFiConfig.hiddenSSID;
-        poResult.success(isSSIDHidden);
+        if (oWiFiConfig != null && oWiFiConfig.hiddenSSID) {
+            poResult.success(oWiFiConfig.hiddenSSID);
+            return;
+        }
+        poResult.error("Exception", "Wifi AP not Supported", null);
     }
 
     private void setSSIDHidden(MethodCall poCall, Result poResult) {
@@ -264,8 +272,11 @@ public class WifiIotPlugin implements MethodCallHandler, EventChannel.StreamHand
      */
     private void getWiFiAPPreSharedKey(Result poResult) {
         WifiConfiguration oWiFiConfig = moWiFiAPManager.getWifiApConfiguration();
-        String sPreSharedKey = oWiFiConfig.preSharedKey;
-        poResult.success(sPreSharedKey);
+        if (oWiFiConfig != null && oWiFiConfig.preSharedKey != null) {
+            poResult.success(oWiFiConfig.preSharedKey);
+            return;
+        }
+        poResult.error("Exception", "Wifi AP not Supported", null);
     }
 
     private void setWiFiAPPreSharedKey(MethodCall poCall, Result poResult) {
@@ -469,27 +480,12 @@ public class WifiIotPlugin implements MethodCallHandler, EventChannel.StreamHand
     /// Is important to enable only when communicating with the device via wifi
     /// and remember to disable it when disconnecting from device.
     private void forceWifiUsage(MethodCall poCall, Result poResult) {
-        boolean canWriteFlag = false;
-
         boolean useWifi = poCall.argument("useWifi");
 
         if (useWifi) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 
-//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//                    canWriteFlag = Settings.System.canWrite(moContext);
-//
-//                    if (!canWriteFlag) {
-//                        Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
-//                        intent.setData(Uri.parse("package:" + moContext.getPackageName()));
-//                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//
-//                        moContext.startActivity(intent);
-//                    }
-//                }
-
-
-                if (((Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) /*&& canWriteFlag*/) || ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) && !(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M))) {
+                if (((Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)) || ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) && !(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M))) {
                     final ConnectivityManager manager = (ConnectivityManager) moContext
                             .getSystemService(Context.CONNECTIVITY_SERVICE);
                     NetworkRequest.Builder builder;
