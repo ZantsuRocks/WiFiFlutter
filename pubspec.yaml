@@ -5,7 +5,7 @@ homepage: https://github.com/alternadom/WiFiFlutter
 
 flutter:
   plugin:
-    androidX: true
+    # androidX: true
     platforms:
       android:
         package: com.alternadom.wifiiot
