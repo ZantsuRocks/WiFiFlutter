@@ -346,10 +346,13 @@ class WiFiForIoTPlugin {
     bool? bResult;
 
     if (Platform.isWindows) {
+      String? realSecurity = serializeNetworkSecurityMap[security];
+      if(security == NetworkSecurity.NONE) realSecurity = 'open';
+      
       bResult = await windowsConnectToNetwork(
         ssid: ssid.toString(),
         password: password ?? "",
-        security: serializeNetworkSecurityMap[security] ?? "NONE",
+        security: realSecurity ?? "open",
       );
     } else {
       if (!Platform.isIOS && !await isEnabled()) await setEnabled(true);
